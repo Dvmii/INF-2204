@@ -2,21 +2,7 @@
 
 This respository contains the experimental setups and scripts for the project. 
 
-patient1.bam
-    ↓
-choose SAMtools-configurations
-    ↓
-execute samtools sort
-    ↓
-measure whats happening
-    ↓
-save results in CSV
-    ↓
-delete output
-    ↓
-change setting
-    ↓
-again
+patient1.bam -> choose SAMtools-configurations -> execute samtools sort -> measure whats happening -> save results in CSV -> delete output -> change settings -> again
 
 ## Respository structure
 
