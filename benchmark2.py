@@ -39,27 +39,30 @@ from datetime import datetime, timezone
 from typing import Any, Iterable
 
 
-# ============================================================
+# ===========================================================
 # EXPERIMENT CONFIGURATION
-# ============================================================
+# ===========================================================
 
-DEFAULT_INPUT_BAM = Path("data/patient1.bam")
-DEFAULT_RESULTS_ROOT = Path("results")
-TEMP_ROOT = Path("benchmark_tmp")
-OUTPUT_ROOT = Path("benchmark_outputs")
+# Main input and output folders used by the benchmark
+DEFAULT_INPUT_BAM = Path("data/patient1.bam")   # Inputs
+DEFAULT_RESULTS_ROOT = Path("results")          # Results
+TEMP_ROOT = Path("benchmark_tmp")               # Temporary files
+OUTPUT_ROOT = Path("benchmark_outputs")         # Temporary files sorted
 
-# Teacher feedback asked for substantially more repetition than five runs.
-# 30 is the default; use --repeats 40 if time permits.
-DEFAULT_FINAL_REPEATS = 30
+# Number of configurations
+DEFAULT_FINAL_REPEATS = 40 # 40 configuration repeats
 DEFAULT_TEST_REPEATS = 1
+
+# Fixed seed so the randomized run order can be repeated.
 RANDOM_SEED = 2204
 
-# Experiment 1: fixed thread count, broad memory sweep.
+
+# Experiment 1: Fixed thread count, test several memory values.
 MEMORY_THREADS = 4
 MEMORY_VALUES_MIB = [64, 128, 256, 512, 768, 1024]
 
-# Experiment 2: vary thread count while holding the nominal sorting-memory
-# budget at approximately 3072 MiB.  (-m is documented per thread.)
+# Experiment 2: varying thread count and hoding a constant nominal sorting-memory (around 3074 MiB)
+# Each tuple is (threads, memory per thread)
 THREAD_CONFIGS = [
     (1, 3072),
     (2, 1536),
@@ -68,12 +71,7 @@ THREAD_CONFIGS = [
     (16, 192),
 ]
 
-# Experiment 3: fine-grained sweep around the expected spill/no-spill region.
-# The 32 MiB step is deliberately finer than experiment 1.  It yields nine
-# levels across the team's current 512-768 MiB bracket, enough resolution to localise
-# a transition without making the campaign unmanageably large.  If a quick
-# test shows the transition lies outside this bracket, change LOW/HIGH before
-# the final campaign.
+# Experiment 3: Look more closely at the area where SAMtools stops making temp. files and can keep the sorting data in memory.
 CLIFF_THREADS = 4
 CLIFF_LOW_MIB = 512
 CLIFF_HIGH_MIB = 768
@@ -82,7 +80,7 @@ CLIFF_MEMORY_VALUES_MIB = list(
     range(CLIFF_LOW_MIB, CLIFF_HIGH_MIB + CLIFF_STEP_MIB, CLIFF_STEP_MIB)
 )
 
-# Baselines used only for summary/comparison metrics.
+# Baselines used for compatison metrics.
 # - memory scaling: SAMtools' default -m value at the same thread count
 # - thread scaling: the one-thread point under the fixed nominal budget
 # - performance cliff: highest-memory point in the local sweep
@@ -92,21 +90,19 @@ BASELINE_BY_EXPERIMENT = {
     "performance_cliff": (CLIFF_THREADS, max(CLIFF_MEMORY_VALUES_MIB)),
 }
 
-# Environmental control.  These checks only cover the Linux/WSL guest; Windows
-# host activity can still be a confounder and should be controlled manually.
+# Environmental control. Scipt checks that the WSL enviroment is idle and has enough free memory/disk space.
 SETTLE_SECONDS = 2.0
 IDLE_CPU_THRESHOLD_PERCENT = 20.0
 IDLE_CHECK_INTERVAL_SECONDS = 2.0
 MAX_IDLE_WAIT_SECONDS = 120.0
 MIN_AVAILABLE_MEMORY_MIB = 2048.0
-MIN_FREE_DISK_FACTOR = 3.0  # free space relative to compressed input size
+MIN_FREE_DISK_FACTOR = 3.0 
 
-# "warm" gives every measured run the same intended page-cache policy: the
-# input is read once before the campaign and caches are NOT dropped between
-# runs.  "cold" is available with --cache-policy cold and requires passwordless
-# sudo permission to drop Linux caches.
+# We use "warm" page cache for the experiments.
+# The BAM input is read once before the runs and the cache is not cleard between runs, so all runs have the same cache policy
 DEFAULT_CACHE_POLICY = "warm"
 
+#GNU time to collect recource measurments.
 TIME_BIN = Path("/usr/bin/time")
 
 
@@ -116,10 +112,12 @@ TIME_BIN = Path("/usr/bin/time")
 
 
 def utc_now() -> str:
+    """Get the current UTC time for longs and results."""
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 
 def run_capture(command: list[str], *, check: bool = False) -> subprocess.CompletedProcess[str]:
+    """Run a command and return its output"""
     return subprocess.run(
         command,
         stdout=subprocess.PIPE,
@@ -132,10 +130,12 @@ def run_capture(command: list[str], *, check: bool = False) -> subprocess.Comple
 
 
 def command_exists(name: str) -> bool:
+    """Checks if command is installed and available"""
     return shutil.which(name) is not None
 
 
 def sha256_file(path: Path, chunk_size: int = 8 * 1024 * 1024) -> str:
+    """Calculate SHA-256 hash do we can identify input file"""
     digest = hashlib.sha256()
     with path.open("rb") as file:
         while True:
@@ -147,6 +147,7 @@ def sha256_file(path: Path, chunk_size: int = 8 * 1024 * 1024) -> str:
 
 
 def read_mem_available_mib() -> float:
+    """Read the current Linux/WSL memory"""
     try:
         with open("/proc/meminfo") as file:
             for line in file:
@@ -159,7 +160,7 @@ def read_mem_available_mib() -> float:
 
 
 def read_cpu_times() -> tuple[int, int]:
-    """Return (idle_jiffies, total_jiffies) from /proc/stat."""
+    """Read idle and total CPU time from linux"""
     with open("/proc/stat") as file:
         fields = file.readline().split()[1:]
     values = [int(value) for value in fields]
@@ -168,6 +169,7 @@ def read_cpu_times() -> tuple[int, int]:
 
 
 def cpu_busy_percent(sample_seconds: float = 0.5) -> float:
+    """Estimate how busy the CPU is"""
     try:
         idle1, total1 = read_cpu_times()
         time.sleep(sample_seconds)
@@ -182,6 +184,7 @@ def cpu_busy_percent(sample_seconds: float = 0.5) -> float:
 
 
 def mean_cpu_mhz() -> float:
+    """Read the current CPU frequensies and return average"""
     values: list[float] = []
     try:
         with open("/proc/cpuinfo") as file:
@@ -194,7 +197,7 @@ def mean_cpu_mhz() -> float:
 
 
 def wait_for_quiet_system() -> dict[str, float]:
-    """Best-effort guard against obvious guest-side background activity."""
+    """Wait untill WSL is reasonably idle before starting a run."""
     deadline = time.monotonic() + MAX_IDLE_WAIT_SECONDS
     last_busy = math.nan
     last_mem = math.nan
@@ -222,6 +225,7 @@ def wait_for_quiet_system() -> dict[str, float]:
         )
         time.sleep(IDLE_CHECK_INTERVAL_SECONDS)
 
+    #gives the system a short moment to settle before measuring
     if SETTLE_SECONDS > 0:
         time.sleep(SETTLE_SECONDS)
 
@@ -233,6 +237,7 @@ def wait_for_quiet_system() -> dict[str, float]:
 
 
 def check_disk_space(input_bam: Path, path: Path) -> None:
+    """Make sure there is enough disk space before starting."""
     free_bytes = shutil.disk_usage(path).free
     required = input_bam.stat().st_size * MIN_FREE_DISK_FACTOR
     if free_bytes < required:
@@ -244,11 +249,9 @@ def check_disk_space(input_bam: Path, path: Path) -> None:
 
 
 def configure_process_priority(target_nice: int | None) -> int | None:
-    """Try to set Linux process niceness; children inherit it.
-
-    Negative niceness (higher priority) normally requires privilege.  We do not
-    silently escalate privileges.  If it cannot be set, the campaign aborts so
-    the environment is not different from what the user requested.
+    """
+    Set the Linuz process priority if one was requested.
+    Child processes like SAMtools will inherit the same priority.
     """
     if target_nice is None or not hasattr(os, "getpriority"):
         return None
@@ -270,6 +273,7 @@ def configure_process_priority(target_nice: int | None) -> int | None:
 
 
 def prepare_cache(input_bam: Path, policy: str) -> None:
+    """Prepare the selected cache state before the runs"""
     if policy == "warm":
         print("Cache policy: warm (reading input once before measured runs)")
         with input_bam.open("rb") as file:
@@ -296,6 +300,7 @@ def prepare_cache(input_bam: Path, policy: str) -> None:
 
 
 def drop_caches_if_requested(policy: str) -> None:
+    """Clear the Linux page cache before a run when there is selected a cold cache""""
     if policy != "cold":
         return
     result = subprocess.run(
@@ -309,11 +314,12 @@ def drop_caches_if_requested(policy: str) -> None:
 
 
 # ============================================================
-# REPRODUCIBILITY / DATASET DESCRIPTION
+# SYSTEM AND DATASET INFORMATION
 # ============================================================
 
 
 def preflight(input_bam: Path) -> None:
+    """Checks that the files and programs needed are ready."""
     if not input_bam.exists():
         raise FileNotFoundError(f"Input BAM not found: {input_bam}")
     if not command_exists("samtools"):
@@ -321,6 +327,7 @@ def preflight(input_bam: Path) -> None:
     if not TIME_BIN.exists():
         raise RuntimeError(f"GNU time not found at {TIME_BIN}")
 
+    # Check the input before spending time on runs.
     quickcheck = subprocess.run(
         ["samtools", "quickcheck", "-v", str(input_bam)],
         stdout=subprocess.PIPE,
@@ -336,6 +343,7 @@ def preflight(input_bam: Path) -> None:
 
 
 def save_system_info(path: Path, *, cache_policy: str, requested_nice: int | None) -> None:
+    """Saves system and software infomration needed to decribe setup."""
     commands = [
         ["uname", "-a"],
         ["lscpu"],
@@ -358,6 +366,7 @@ def save_system_info(path: Path, *, cache_policy: str, requested_nice: int | Non
             file.write(f"Actual niceness: {os.getpriority(os.PRIO_PROCESS, 0)}\n")
         file.write("\n")
 
+        # Saves the output from each command in the same file
         for command in commands:
             file.write("$ " + " ".join(command) + "\n")
             file.write("=" * 72 + "\n")
@@ -370,6 +379,7 @@ def save_system_info(path: Path, *, cache_policy: str, requested_nice: int | Non
 
 
 def parse_header_characteristics(header: str) -> dict[str, Any]:
+    """Extracts useful dataset info from BAM header."""
     sort_order = "unknown"
     references = 0
     reference_bases = 0
@@ -379,10 +389,12 @@ def parse_header_characteristics(header: str) -> dict[str, Any]:
         fields = line.split("\t")
         if not fields:
             continue
+        # @HD contains info like sorting order.
         if fields[0] == "@HD":
             for field in fields[1:]:
                 if field.startswith("SO:"):
                     sort_order = field[3:]
+        # @SQ describes the reference seequence
         elif fields[0] == "@SQ":
             references += 1
             for field in fields[1:]:
@@ -391,6 +403,7 @@ def parse_header_characteristics(header: str) -> dict[str, Any]:
                         reference_bases += int(field[3:])
                     except ValueError:
                         pass
+        # @RG contains read-group info
         elif fields[0] == "@RG":
             read_groups += 1
 
@@ -403,6 +416,7 @@ def parse_header_characteristics(header: str) -> dict[str, Any]:
 
 
 def save_dataset_info(input_bam: Path, txt_path: Path, json_path: Path) -> dict[str, Any]:
+    """Collect and save information about the BAM file"""
     print("Profiling dataset (size, records, header, flagstat, SHA-256)...")
 
     header_result = run_capture(["samtools", "view", "-H", str(input_bam)], check=True)
@@ -444,10 +458,9 @@ def save_dataset_info(input_bam: Path, txt_path: Path, json_path: Path) -> dict[
 
 
 def measure_instrumentation_overhead(path: Path, iterations: int = 30) -> None:
-    """Estimate the overhead added by wrapping a tiny process in GNU time.
+    """Estimate thow much extra time was added by using GNU time.
 
-    The value is diagnostic only; it is not subtracted from measured sort time.
-    For a long-running sort it should be tiny relative to the workload.
+    The value is diagnostic only, so not subtracted from the SAMtools measurment.
     """
     true_bin = shutil.which("true")
     if true_bin is None:
@@ -459,10 +472,12 @@ def measure_instrumentation_overhead(path: Path, iterations: int = 30) -> None:
     scratch = path.with_suffix(".time.tmp")
 
     for _ in range(iterations):
+        # First measure the tiny command without GNU time
         start = time.perf_counter()
         subprocess.run([true_bin], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         direct.append(time.perf_counter() - start)
 
+        # Then run the same command though GNU time
         start = time.perf_counter()
         subprocess.run(
             [str(TIME_BIN), "-v", "-o", str(scratch), true_bin],
@@ -494,7 +509,7 @@ def measure_instrumentation_overhead(path: Path, iterations: int = 30) -> None:
 
 
 def parse_gnu_time(path: Path) -> dict[str, float | int]:
-    """Read the fields used from /usr/bin/time -v output."""
+    """Read the measurments used from /usr/bin/time -v output."""
     values: dict[str, str] = {}
 
     with path.open() as file:
@@ -543,17 +558,11 @@ def parse_gnu_time(path: Path) -> dict[str, float | int]:
 
 
 def parse_samtools_stderr(path: Path) -> dict[str, int | bool | None]:
-    """Parse SAMtools' final merge message.
+    """
+    Parses  SAMtools' final merge message.
 
-    Operational definition used in this project:
-    - temp_files_for_final_merge: on-disk temporary runs reported by SAMtools
-      as inputs to the final merge.
-    - in_memory_blocks_for_final_merge: in-memory runs reported in the same
-      message.
-    - disk_merge_input_fraction: temp_files / (temp_files + in_memory_blocks),
-      a count-based comparison metric (not a byte fraction).
-
-    Missing parser output is represented as blank/None, never as a false zero.
+    If the merge message cannot be parsed the Values return None, 
+    so parser failure is not confused with no temp files.
     """
     text = path.read_text(errors="replace")
     matches = re.findall(
@@ -570,7 +579,9 @@ def parse_samtools_stderr(path: Path) -> dict[str, int | bool | None]:
             "merge_messages": 0,
         }
 
+    # Uses the final merge message if SAMtools prints more than one
     temp_files, in_memory_blocks = map(int, matches[-1])
+    
     return {
         "temp_files_for_final_merge": temp_files,
         "in_memory_blocks_for_final_merge": in_memory_blocks,
@@ -585,8 +596,10 @@ def parse_samtools_stderr(path: Path) -> dict[str, int | bool | None]:
 
 
 def build_runs(mode: str, repeats: int, seed: int) -> list[dict[str, Any]]:
+    """Builds the list of benchmark runs"""
     runs: list[dict[str, Any]] = []
 
+    #Test mode runs two configs to check that the benchmark works before running everything.
     if mode == "test":
         runs = [
             {
@@ -604,13 +617,13 @@ def build_runs(mode: str, repeats: int, seed: int) -> list[dict[str, Any]]:
         ]
 
     elif mode == "final":
-        # Randomized complete blocks: every repetition contains every final
-        # configuration exactly once, then the order within that repetition is
-        # shuffled deterministically.  This spreads time/temperature drift across
-        # configurations rather than always favouring an early or late setting.
+        # Each repetition contains all experiment configs once.
+        # The order is shuffled to avoid testing the same each time.
+        # Config early or late in the runs.
         for repeat in range(1, repeats + 1):
             block: list[dict[str, Any]] = []
 
+            # Experiment 1: memory scaling
             for memory_mib in MEMORY_VALUES_MIB:
                 block.append(
                     {
@@ -621,6 +634,7 @@ def build_runs(mode: str, repeats: int, seed: int) -> list[dict[str, Any]]:
                     }
                 )
 
+            # Experiment 2: thread scaling
             for threads, memory_mib in THREAD_CONFIGS:
                 block.append(
                     {
@@ -631,6 +645,7 @@ def build_runs(mode: str, repeats: int, seed: int) -> list[dict[str, Any]]:
                     }
                 )
 
+            # Experiment 3: performance cliff zoom-in.
             for memory_mib in CLIFF_MEMORY_VALUES_MIB:
                 block.append(
                     {
@@ -641,6 +656,7 @@ def build_runs(mode: str, repeats: int, seed: int) -> list[dict[str, Any]]:
                     }
                 )
 
+            # Uses the seed so the shuffleded order can be reproduced.
             rng = random.Random(seed + repeat)
             rng.shuffle(block)
             runs.extend(block)
@@ -648,6 +664,7 @@ def build_runs(mode: str, repeats: int, seed: int) -> list[dict[str, Any]]:
     else:
         raise ValueError(f"Unsupported mode: {mode}")
 
+    # Gives every run a unique number and name.
     for run_number, run in enumerate(runs, start=1):
         run["run_number"] = run_number
         run["run_id"] = (
@@ -668,7 +685,7 @@ def save_run_plan(path: Path, runs: Iterable[dict[str, Any]]) -> None:
 
 
 # ============================================================
-# ONE MEASURED RUN
+# ONE BENCHMARK RUN
 # ============================================================
 
 
@@ -719,6 +736,7 @@ def run_one(
     output_root: Path,
     cache_policy: str,
 ) -> dict[str, Any]:
+    """Run one SAMtools config and collect its measurments."""
     run_number = int(config["run_number"])
     run_id = str(config["run_id"])
     experiment = str(config["experiment"])
@@ -740,18 +758,21 @@ def run_one(
     time_file = raw_dir / f"{run_id}_time.txt"
     stderr_file = raw_dir / f"{run_id}_samtools.stderr.txt"
 
+    # Remove anything left from earlier runs with the same ID.
     shutil.rmtree(temp_dir, ignore_errors=True)
     temp_dir.mkdir(parents=True, exist_ok=True)
     output_bam.unlink(missing_ok=True)
 
+    # Prepares the request chache state.
     drop_caches_if_requested(cache_policy)
-    # Flush writes from the previous run first, then wait until the guest is
-    # quiet.  Doing this in the opposite order would let sync itself disturb
-    # the start of the measured run.
+    # Finish pending writes before checking if the system is quiet.
     subprocess.run(["sync"], check=False)
     env_before = wait_for_quiet_system()
 
     disk_free_before_gib = shutil.disk_usage(output_root).free / 1024**3
+    
+    # Command used for measured SAMtools sort
+    # GNU time wraps SAMTools so we can collect statistics.
     command = [
         str(TIME_BIN),
         "-v",
@@ -773,6 +794,8 @@ def run_one(
     start_utc = utc_now()
     start = time.perf_counter()
 
+    # Save SAMtools stderr bc it contains the merge information
+    # used to count temp files and in-memory blocks.
     with stderr_file.open("w") as stderr:
         process = subprocess.run(
             command,
@@ -782,6 +805,7 @@ def run_one(
 
     wall_time_s = time.perf_counter() - start
 
+    # Reads the measurments collected by GNU
     timing = parse_gnu_time(time_file) if time_file.exists() else {
         "max_rss_kib": 0,
         "user_time_s": 0.0,
@@ -793,8 +817,11 @@ def run_one(
         "major_page_faults": 0,
         "minor_page_faults": 0,
     }
+
+    # Read SAMtools merge info.
     sorting = parse_samtools_stderr(stderr_file)
 
+    # Chech that the produced BAM file is valid
     output_valid = False
     if process.returncode == 0 and output_bam.exists():
         check = subprocess.run(
@@ -806,12 +833,16 @@ def run_one(
 
     input_bytes = input_bam.stat().st_size
     output_bytes = output_bam.stat().st_size if output_bam.exists() else 0
+    
+    # Input thoughtput based on BAM size and wall-clock time.
     throughput_mib_s = (
         input_bytes / 1024**2 / wall_time_s if wall_time_s > 0 else math.nan
     )
 
     temp_files = sorting["temp_files_for_final_merge"]
     memory_blocks = sorting["in_memory_blocks_for_final_merge"]
+    
+    # Fraction of final merge that came from disk.
     if isinstance(temp_files, int) and isinstance(memory_blocks, int):
         denominator = temp_files + memory_blocks
         disk_fraction: float | None = temp_files / denominator if denominator else 0.0
@@ -820,6 +851,7 @@ def run_one(
 
     status = "ok" if process.returncode == 0 and output_valid else "failed"
 
+    # Store everything mesured in this one run in one dictionary
     result: dict[str, Any] = {
         "run_number": run_number,
         "run_id": run_id,
@@ -866,6 +898,7 @@ def run_one(
     print(f"in-memory blocks:{memory_blocks if memory_blocks is not None else ' PARSE FAILED'}")
     print(f"output valid:    {output_valid}")
 
+    # The sorted BAM and temp files are not needed after validation
     output_bam.unlink(missing_ok=True)
     shutil.rmtree(temp_dir, ignore_errors=True)
 
@@ -873,11 +906,12 @@ def run_one(
 
 
 # ============================================================
-# PERSISTENCE / RESUME
+# SAVING AND RESUMING RESULTS
 # ============================================================
 
 
 def read_completed_run_ids(results_csv: Path) -> set[str]:
+    """FInds runs that have already finished successfully."""
     if not results_csv.exists():
         return set()
     with results_csv.open(newline="") as file:
@@ -889,22 +923,28 @@ def read_completed_run_ids(results_csv: Path) -> set[str]:
 
 
 def append_result(results_csv: Path, result: dict[str, Any]) -> None:
+    """
+    Adds one completed run to the result file
+    """
     is_new = not results_csv.exists() or results_csv.stat().st_size == 0
     with results_csv.open("a", newline="") as file:
         writer = csv.DictWriter(file, fieldnames=RESULT_COLUMNS)
+        # Only wrties header when writing a new result-file
         if is_new:
             writer.writeheader()
         writer.writerow(result)
+        # Makes sure that the result is written to disk
         file.flush()
         os.fsync(file.fileno())
 
 
 # ============================================================
-# SUMMARY / COMPARISON METRICS
+# SUMMARY AND COMPARISON METRICS
 # ============================================================
 
 
 def parse_optional_float(value: str | None) -> float | None:
+    """Converts a CSV value to a float when it is possible."""
     if value is None or value == "":
         return None
     try:
@@ -914,17 +954,24 @@ def parse_optional_float(value: str | None) -> float | None:
 
 
 def median_or_none(values: list[float]) -> float | None:
+    """Returns the median or None"""
     return statistics.median(values) if values else None
 
 
 def stdev_or_none(values: list[float]) -> float | None:
+    """Return the standard deviation when enough values for it"""
     return statistics.stdev(values) if len(values) >= 2 else None
 
 
 def create_summary(results_csv: Path, summary_csv: Path) -> None:
+    """
+    Crerates a summary of all successfull benchmark runs.
+    """
+    # Only successfull runs included
     with results_csv.open(newline="") as file:
         rows = [row for row in csv.DictReader(file) if row.get("status") == "ok"]
 
+    # Group repeated runs of the same config together
     grouped: dict[tuple[str, int, int], list[dict[str, str]]] = {}
     for row in rows:
         key = (
@@ -935,10 +982,14 @@ def create_summary(results_csv: Path, summary_csv: Path) -> None:
         grouped.setdefault(key, []).append(row)
 
     stats_by_key: dict[tuple[str, int, int], dict[str, Any]] = {}
+
+    # Calculates summary statistics for each config.
     for key, group in grouped.items():
         wall = [float(row["wall_time_s"]) for row in group]
         throughput = [float(row["throughput_mib_s"]) for row in group]
         rss = [float(row["max_rss_mib"]) for row in group]
+        
+        # Some values may be missing if SAMtools output couldnt be parsed.
         temp = [
             value
             for row in group
@@ -972,6 +1023,7 @@ def create_summary(results_csv: Path, summary_csv: Path) -> None:
             "disk_merge_input_fraction_median": median_or_none(disk_fraction),
         }
 
+    # Columns written to summary.csv
     fields = [
         "experiment",
         "threads",
@@ -1004,12 +1056,14 @@ def create_summary(results_csv: Path, summary_csv: Path) -> None:
             experiment, threads, memory_mib = key
             stats = stats_by_key[key]
 
+            # Finds the baseline config for this experiment.
             baseline_config = BASELINE_BY_EXPERIMENT.get(experiment)
             runtime_ratio: float | None = None
             speedup: float | None = None
             baseline_threads: int | None = None
             baseline_memory: int | None = None
 
+            # Compares the median runtime with the chosen baseline.
             if baseline_config is not None:
                 baseline_threads, baseline_memory = baseline_config
                 baseline_stats = stats_by_key.get(
@@ -1051,6 +1105,7 @@ def write_campaign_config(
     cache_policy: str,
     nice_value: int | None,
 ) -> None:
+    """Saves the settings used for the experiment"""
     config = {
         "created_utc": utc_now(),
         "mode": mode,
@@ -1076,12 +1131,17 @@ def write_campaign_config(
 
 
 def reset_campaign_dir(campaign_dir: Path) -> None:
+    """Removes old experiment results and creates a clean directory."""
     if campaign_dir.exists():
         shutil.rmtree(campaign_dir)
     campaign_dir.mkdir(parents=True, exist_ok=True)
 
+# ============================================================
+# MAIN
+# ============================================================
 
 def main() -> None:
+    """Sets up and runs the benchmark campaign"""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("mode", choices=["test", "final"], nargs="?", default="test")
     parser.add_argument("--input", type=Path, default=DEFAULT_INPUT_BAM)
@@ -1099,11 +1159,14 @@ def main() -> None:
         default=None,
         help="Linux niceness to request (negative means higher priority and may require privilege)",
     )
+
+    # Resume and overwrite can not be used simultaniously.
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--resume", action="store_true")
     group.add_argument("--overwrite", action="store_true")
     args = parser.parse_args()
 
+    # Uses the default number of reps unless the user provides one.
     repeats = args.repeats
     if repeats is None:
         repeats = DEFAULT_TEST_REPEATS if args.mode == "test" else DEFAULT_FINAL_REPEATS
@@ -1112,6 +1175,8 @@ def main() -> None:
 
     input_bam = args.input.resolve()
     results_root = args.results_root.resolve()
+
+    # Test and final campaigns are stored seperatly.
     campaign_dir = results_root / args.mode
 
     if args.overwrite:
@@ -1119,6 +1184,7 @@ def main() -> None:
     else:
         campaign_dir.mkdir(parents=True, exist_ok=True)
 
+    # Files created for this campaign.
     results_csv = campaign_dir / "results.csv"
     summary_csv = campaign_dir / "summary.csv"
     system_info = campaign_dir / "system_info.txt"
@@ -1130,21 +1196,25 @@ def main() -> None:
     raw_dir = campaign_dir / "raw"
     raw_dir.mkdir(exist_ok=True)
 
+    # Temp files and sorted BAm output are kept outside of the result directory bc they will be deleted.
     temp_root = TEMP_ROOT.resolve() / args.mode
     output_root = OUTPUT_ROOT.resolve() / args.mode
     temp_root.mkdir(parents=True, exist_ok=True)
     output_root.mkdir(parents=True, exist_ok=True)
 
+    #Avoids accidentally overwriting another campaign
     if results_csv.exists() and not args.resume and not args.overwrite:
         raise FileExistsError(
             f"{results_csv} already exists. Use --resume to continue it or "
             "--overwrite to start this campaign again."
         )
 
+    # Checks the input and system ebfore starting any runs.
     preflight(input_bam)
     configure_process_priority(args.nice)
     check_disk_space(input_bam, output_root)
 
+    # Save info needed to udnerstand and reproduce the campaign.
     save_system_info(
         system_info,
         cache_policy=args.cache_policy,
@@ -1162,8 +1232,11 @@ def main() -> None:
         nice_value=args.nice,
     )
 
+    # Builds and saves the exact order of runs in this campaign.
     runs = build_runs(args.mode, repeats, args.seed)
     save_run_plan(run_plan_csv, runs)
+
+    # When resuming, skip runs that are already completed succecfully.
     completed = read_completed_run_ids(results_csv) if args.resume else set()
 
     print()
@@ -1177,8 +1250,10 @@ def main() -> None:
     print(f"Results: {results_csv}")
     print("=" * 78)
 
+    # Prepares the selected page-cache state before beginning measurments.
     prepare_cache(input_bam, args.cache_policy)
 
+    # Run every planned config.
     for config in runs:
         if config["run_id"] in completed:
             print(f"SKIP completed: {config['run_id']}")
@@ -1192,15 +1267,17 @@ def main() -> None:
             output_root=output_root,
             cache_policy=args.cache_policy,
         )
-        # Persist the run even if validation failed, so failures are part of
-        # the experimental record rather than disappearing silently.
+
+        # Save every run asap, incuding failes ones, this makes failures cisible instead of loosing them silently.
         append_result(results_csv, result)
+        # Stop campaign if a run failed, to check.
         if result["status"] != "ok":
             raise RuntimeError(
                 f"Run {result['run_id']} failed (exit={result['exit_code']}, "
                 f"valid={result['output_valid']}). Inspect its raw stderr file."
             )
 
+    # Summarizes all successful runs after campaign is done.
     create_summary(results_csv, summary_csv)
 
     print()
