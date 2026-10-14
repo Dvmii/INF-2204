@@ -174,19 +174,5 @@ The benchmark uses a warm input-file cache and randomizes the configuration orde
 
 ## Validation
 
-After the primary experiment, selected configurations before, around and after the observed performance cliff will also be tested on a second BAM file.
+After the primary experiment, selected configurations before, around and after the observed performance cliff will also be tested on a second BAM file. And a small subset may also be tested on another computer if time allows.
 
-A small subset may also be tested on another computer if time allows.
-
-INF-2204/
-- benchmark.py
-- data/
-- - patient1.bam <- local file
-- plots/
-- results/
-- - results.csv
-- - system_into.txt
-- benchmark_outputs
-- benchmark_tmp
-- .gitignore
-- README.md
