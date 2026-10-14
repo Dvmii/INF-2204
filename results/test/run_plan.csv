@@ -1,3 +1,0 @@
-run_number,run_id,experiment,repeat,threads,memory_mib
-1,0001_test_rep01_t4_m128,test,1,4,128
-2,0002_test_rep01_t4_m768,test,1,4,768

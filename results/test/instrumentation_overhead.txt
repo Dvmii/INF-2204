@@ -1,7 +1,0 @@
-GNU time wrapper overhead estimate
-========================================================================
-iterations: 30
-median direct process time_s: 0.000406005
-median instrumented process time_s: 0.000892039
-estimated wrapper overhead_s: 0.000486034
-This diagnostic is not subtracted from benchmark measurements.

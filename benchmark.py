@@ -50,7 +50,7 @@ THREAD_EXPERIMENT = [
 
 # Experiment 3:
 # Look more closely at the area where temporary files disappear.
-# Change this range later if the broad memory experiment shows
+# TODO: We will change this range later if the broad memory experiment shows
 # that the transition is somewhere else.
 CLIFF_EXPERIMENT = [
     {"threads": 4, "memory_mib": memory}
@@ -84,7 +84,7 @@ RESULT_COLUMNS = [
 # ============================================================
 
 def check_setup():
-    """Check that the input BAM and required programs are available."""
+    """Checks that the input BAM and required programs are available."""
 
     if not INPUT_BAM.exists():
         raise FileNotFoundError(f"Input BAM not found: {INPUT_BAM}")
@@ -111,7 +111,7 @@ def check_setup():
 
 
 def run_text(command):
-    """Run a command and return its output as text."""
+    """Runs a command and returns its output as text."""
 
     result = subprocess.run(
         command,
@@ -126,7 +126,7 @@ def run_text(command):
 
 
 def save_system_info(path):
-    """Save the main hardware and software information."""
+    """Saves the main hardware and software information."""
 
     commands = [
         ["uname", "-a"],

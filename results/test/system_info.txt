@@ -1,15 +1,10 @@
-Recorded UTC: 2026-10-14T11:57:58+00:00
-Cache policy: warm
-Requested niceness: None
-Actual niceness: 0
-
 $ uname -a
-========================================================================
+============================================================
 Linux dictespc 6.18.54.1-microsoft-standard-WSL2 #1 SMP PREEMPT_DYNAMIC Tue Oct  6 19:13:07 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
-[exit code 0]
+
 
 $ lscpu
-========================================================================
+============================================================
 Architecture:                            x86_64
 CPU op-mode(s):                          32-bit, 64-bit
 Address sizes:                           39 bits physical, 48 bits virtual
@@ -54,35 +49,23 @@ Vulnerability Srbds:                     Not affected
 Vulnerability Tsa:                       Not affected
 Vulnerability Tsx async abort:           Not affected
 Vulnerability Vmscape:                   Not affected
-[exit code 0]
+
 
 $ free -h
-========================================================================
+============================================================
                total        used        free      shared  buff/cache   available
-Mem:           7.6Gi       1.1Gi       6.2Gi       4.0Mi       352Mi       6.4Gi
+Mem:           7.6Gi       1.1Gi       6.1Gi       4.0Mi       386Mi       6.3Gi
 Swap:          2.0Gi          0B       2.0Gi
-[exit code 0]
+
 
 $ df -hT .
-========================================================================
+============================================================
 Filesystem     Type  Size  Used Avail Use% Mounted on
 /dev/sdd       ext4 1007G   43G  914G   5% /
-[exit code 0]
 
-$ lsblk -o NAME,TYPE,SIZE,FSTYPE,MOUNTPOINTS,MODEL
-========================================================================
-NAME TYPE   SIZE FSTYPE MOUNTPOINTS                                              MODEL
-sda  disk 722.9M ext4                                                            Virtual Disk
-sdb  disk    97M ext4   /usr/lib/linux-tools/6.18.54.1-microsoft-standard-WSL2   Virtual Disk
-                        /usr/src/linux-headers-6.18.54.1-microsoft-standard-WSL2 
-sdc  disk     2G swap   [SWAP]                                                   Virtual Disk
-sdd  disk     1T ext4   /snap                                                    Virtual Disk
-                        /mnt/wslg/distro                                         
-                        /                                                        
-[exit code 0]
 
 $ samtools --version
-========================================================================
+============================================================
 samtools 1.13
 Using htslib 1.13+ds
 Copyright (C) 2021 Genome Research Ltd.
@@ -108,92 +91,10 @@ HTSlib URL scheme handlers present:
     built-in:	 preload, data, file
     crypt4gh-needed:	 crypt4gh
     mem:	 mem
-[exit code 0]
 
-$ /usr/bin/time --version
-========================================================================
-time (GNU Time) UNKNOWN
-Copyright (C) 2018 Free Software Foundation, Inc.
-License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
-This is free software: you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
 
-Written by David Keppel, David MacKenzie, and Assaf Gordon.
-[exit code 0]
-
-$ /usr/bin/python3 --version
-========================================================================
+$ python3 --version
+============================================================
 Python 3.10.12
-[exit code 0]
 
-$ git rev-parse HEAD
-========================================================================
-bd75964930954fb176053f8d6536d237823893ff
-[exit code 0]
-
-$ git status --short
-========================================================================
- M benchmark2.py
-?? results/test/
-[exit code 0]
-
-$ ps -eo pid,ni,pcpu,pmem,comm --sort=-pcpu
-========================================================================
-    PID  NI %CPU %MEM COMMAND
-    973   0  3.4  5.7 MainThread
-    911   0  1.0  2.0 MainThread
-    136   0  0.4  0.1 snapfuse
-    474   0  0.4  1.2 python3.10
-    960   0  0.4  1.7 MainThread
-    934   0  0.2  0.7 MainThread
-   1031   0  0.2  0.6 copilot-runtime
-      1   0  0.1  0.1 systemd
-    114   0  0.1  0.1 snapfuse
-    146   0  0.1  0.1 snapfuse
-    273   0  0.1  0.5 snapd
-      2   0  0.0  0.0 init-systemd(Ub
-      3   0  0.0  0.0 init-watcher
-      7   0  0.0  0.0 init
-     61  -1  0.0  0.1 systemd-journal
-     82   0  0.0  0.0 systemd-udevd
-     94   0  0.0  0.0 snapfuse
-     95   0  0.0  0.0 snapfuse
-    100   0  0.0  0.0 snapfuse
-    107   0  0.0  0.0 snapfuse
-    120   0  0.0  0.0 snapfuse
-    126   0  0.0  0.0 snapfuse
-    135   0  0.0  0.0 snapfuse
-    144   0  0.0  0.0 snapfuse
-    175   0  0.0  0.1 systemd-resolve
-    176   0  0.0  0.0 systemd-timesyn
-    262   0  0.0  0.0 cron
-    264   0  0.0  0.0 dbus-daemon
-    269   0  0.0  0.2 networkd-dispat
-    270   0  0.0  0.0 rsyslogd
-    271   0  0.0  0.0 subiquity-serve
-    274   0  0.0  0.0 systemd-logind
-    277   0  0.0  0.1 wsl-pro-service
-    309   0  0.0  0.0 agetty
-    329   0  0.0  0.2 unattended-upgr
-    482   0  0.0  0.0 login
-    533   0  0.0  0.1 systemd
-    534   0  0.0  0.0 (sd-pam)
-    549   0  0.0  0.0 bash
-    735   0  0.0  0.0 SessionLeader
-    736   0  0.0  0.0 Relay(737)
-    737   0  0.0  0.0 bash
-    898   0  0.0  0.0 SessionLeader
-    899   0  0.0  0.0 Relay(900)
-    900   0  0.0  0.0 sh
-    901   0  0.0  0.0 sh
-    907   0  0.0  0.0 sh
-    923   0  0.0  0.0 SessionLeader
-    924   0  0.0  0.0 Relay(925)
-    925   0  0.0  0.8 MainThread
-    932   0  0.0  0.0 SessionLeader
-    933   0  0.0  0.0 Relay(934)
-    966   0  0.0  0.7 MainThread
-   2643   0  0.0  0.2 python3
-   2661   0  0.0  0.0 ps
-[exit code 0]
 

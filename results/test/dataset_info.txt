@@ -1,17 +1,10 @@
-Dataset characteristics
-========================================================================
 path: /home/dicte/programmering/inf2204/data/patient1.bam
-size_bytes: 642951215
-size_mib: 613.1660604476929
+size_mib: 613.17
 alignment_records: 12386220
 header_sort_order: unsorted
-reference_sequences: 25
-reference_bases: 3080106534
-read_groups: 0
-sha256: ece402f458c233471d3d0524d80eb0fa0bb3ba0b2ed5461874de3ee636f5cbed
 
 $ samtools flagstat
-========================================================================
+============================================================
 12386220 + 0 in total (QC-passed reads + QC-failed reads)
 12386220 + 0 primary
 0 + 0 secondary
