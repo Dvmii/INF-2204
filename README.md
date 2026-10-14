@@ -1,10 +1,182 @@
 # INF-2204 Project - SAMtools sort performance
 
-This respository contains the experimental setups and scripts for the project. 
+This respository contains the experimental setups and scripts for the project. The project investigates how memory per thread and thread count affect the performance of `samtools sort`.
 
 patient1.bam -> choose SAMtools-configurations -> execute samtools sort -> measure whats happening -> save results in CSV -> delete output -> change settings -> again
 
-## Respository structure
+## Mapping performance cliffs in SAMtools sort
+
+Our main focus is execution time, peak memory usage, filesystem activity and temporary-file activity. The goal is to identify performance cliffs and see whether they are related to changes in temporary-file usage.
+
+## Files
+
+```text
+benchmark.py       Benchmark script
+data/              Input BAM files
+results/           Raw benchmark results and system information
+plots/             Figures created from the results
+```
+
+## Requirements
+
+The experiments are run in Ubuntu/WSL2 and require:
+
+- Python 3
+- SAMtools
+- GNU `/usr/bin/time`
+
+The primary input file is expected to be at:
+
+```text
+data/patient1.bam
+```
+
+## Dataset ##
+
+The unsorted BAM file that is used as input is not, as mentioned, inlcuded in git respository, as it is too large for github. 
+
+File size: 614 MiB
+number of alignment records: 12386220
+BAM-file source: https://doi.org/10.5281/zenodo.892432 
+
+## Experiments
+
+### Experiment 1 - Memory per thread
+
+In this experiment the number of threads is fixed at 4 while memory per thread is changed:
+
+```text
+64, 128, 256, 512, 768 and 1024 MiB
+```
+
+### Experiment 2 - Thread count
+
+In this experiment the thread count is changed while the planned sorting memory is kept close to 3072 MiB:
+
+```text
+1 thread  x 3072 MiB
+2 threads x 1536 MiB
+4 threads x  768 MiB
+8 threads x  384 MiB
+16 threads x 192 MiB
+```
+
+### Experiment 3 - Performance cliff
+
+in this experiment the thread count is fixed at 4 and memory is tested in smaller steps around the point where temporary files disappear.
+
+TODO: UPDATE HERE
+
+## Measurements
+
+For every run the benchmark records:
+- wall-clock execution time
+- throughput
+- peak memory usage (RSS)
+- user and system CPU time
+- filesystem inputs and outputs
+- temporary files used in the final merge
+- in-memory blocks used in the final merge
+- temporary-file merge fraction
+
+The resulting BAM file is checked with `samtools quickcheck` after every run. The BAM output and temporary files are then deleted.
+
+## Running the experiments
+
+Run all commands from the project directory.
+
+### 1. Test the benchmark
+
+First run the small test:
+
+```bash
+python3 benchmark.py test --overwrite
+```
+
+This runs two configurations and checks that the benchmark and measurements work correctly.
+
+Test results are saved in:
+
+```text
+results/test/
+```
+
+### 2. Pilot experiment
+
+Before the final experiment, run each configuration 5 times:
+
+```bash
+python3 benchmark.py final --repeats 5 --overwrite
+```
+
+This pilot is used to find the area where temporary files disappear and to choose the final range for Experiment 3.
+
+Before starting the final campaign, keep the pilot results:
+
+```bash
+mv results/final results/pilot
+```
+
+Then update `CLIFF_EXPERIMENT` in `benchmark.py` if needed.
+
+### 3. Final experiment
+
+When the configurations are finalized, run:
+
+```bash
+python3 benchmark.py final --repeats 40 --overwrite
+```
+
+With the current 20 configurations this gives:
+
+```text
+20 configurations x 40 repetitions = 800 measured runs
+```
+
+The configurations are randomized within every repetition.
+
+Final results are stored in:
+
+```text
+results/final/
+```
+
+### Continuing an interrupted experiment
+
+If the final experiment is interrupted, do not use `--overwrite`.
+
+Continue with:
+
+```bash
+python3 benchmark.py final --repeats 40 --resume
+```
+
+Runs that already completed successfully will be skipped.
+
+## Results
+
+A campaign produces:
+
+`results.csv` contains the measurements used for analysis.
+
+`raw/` contains the raw output from SAMtools and GNU time for each run.
+
+`dataset_info.txt` describes the input BAM file.
+
+`system_info.txt` contains information about the machine and software
+environment.
+
+## Experimental conditions
+
+The experiments should be run on the same machine and software environment. During the final campaign, avoid other heavy workloads such as gaming, downloads or compilation.
+
+The benchmark uses a warm input-file cache and randomizes the configuration order to reduce systematic effects from run order and background variation.
+
+## Validation
+
+After the primary experiment, selected configurations before, around and after the observed performance cliff will also be tested on a second BAM file.
+
+A small subset may also be tested on another computer if time allows.
 
 INF-2204/
 - benchmark.py
@@ -18,83 +190,3 @@ INF-2204/
 - benchmark_tmp
 - .gitignore
 - README.md
-
-## Dataset ##
-
-The unsorted BAM file that is used as input is not inlcuded in git respository, as it is too large for github. 
-
-File size: 614 MiB
-number of alignment records: 12386220
-
-## Requirements ##
-- Python 3
-SAMtools
-GNU time
-
-## Benchmark ##
-The benchmark contains three experiments (as of now). 
-
-Experiment 1:
-- The number of threads is fixed at 4 while the memory per thread varies. 
-- We test -m = 64M, 128M, 256M, 512M, 768M, and 1024M. 
-
-Experiment 2:
-- The mumber of threads is varied while the memory budget is constant.
-- The value of -m is adjusted according to the number of threads:
-    -@ 1, -m 3072M
-    -@ 2, -m 1536M
-    -@ 4, -m 768M
-    -@ 8, -m 384M
-    -@ 16, -m 192M
-
-Experiment 3:
-- The number of threads is fixed at 4, while -m is varied in a smaller range aroung the point where temprarry files disappear.
-- The exact -m values will be selected after calibration on the machine we will run the experiments on.  
-
-## RUN ##
-You need to input the BAM file in data/patient1.bam.
-Use TEST_MODE = True to verify the benchmark works correctly.
-Run with: python3 benchmark.py
-Use TEST_MODE = False for the final experiment.
-
-You will get this output: results.csv, system_info.txt.
-
-## Running benchmark2.py
-
-First, test that everything works:
-
-```bash
-python3 benchmark2.py test --overwrite
-``` 
-
-This performs 2 quick test runs and checks timing, memory measurements, temporary-file detection, BAM validation, and result output.
-
-To run all experimental configurations once:
-```bash
-python3 benchmark2.py final --repeats 1 --overwrite
-```
-
-
-To run the full experiment campaign with 30 repetitions per configuration:
-```bash
-python3 benchmark2.py final --repeats 30 --overwrite
-```
-
-The current design has 20 configurations, so 30 repetitions gives 600 measured runs.
-If a run is interrupted, continue with:
-```bash
-python3 benchmark2.py final --repeats 30 --resume
-``` 
-
-Use --overwrite only when starting a new campaign.
-Results are stored in:
-results/test/
-results/final/
-
-The main output files are:
-- results.csv – measurements from each run
-- summary.csv – aggregated results
-- dataset_info.txt – dataset information
-- system_info.txt – hardware/software information
-- instrumentation_overhead.txt – measurement overhead
-
