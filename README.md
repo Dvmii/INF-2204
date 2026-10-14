@@ -59,4 +59,42 @@ Use TEST_MODE = False for the final experiment.
 
 You will get this output: results.csv, system_info.txt.
 
+## Running benchmark2.py
+
+First, test that everything works:
+
+```bash
+python3 benchmark2.py test --overwrite
+``` 
+
+This performs 2 quick test runs and checks timing, memory measurements, temporary-file detection, BAM validation, and result output.
+
+To run all experimental configurations once:
+```bash
+python3 benchmark2.py final --repeats 1 --overwrite
+```
+
+
+To run the full experiment campaign with 30 repetitions per configuration:
+```bash
+python3 benchmark2.py final --repeats 30 --overwrite
+```
+
+The current design has 20 configurations, so 30 repetitions gives 600 measured runs.
+If a run is interrupted, continue with:
+```bash
+python3 benchmark2.py final --repeats 30 --resume
+``` 
+
+Use --overwrite only when starting a new campaign.
+Results are stored in:
+results/test/
+results/final/
+
+The main output files are:
+- results.csv – measurements from each run
+- summary.csv – aggregated results
+- dataset_info.txt – dataset information
+- system_info.txt – hardware/software information
+- instrumentation_overhead.txt – measurement overhead
 
