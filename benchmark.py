@@ -505,4 +505,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    counter = 0
+    while True:
+        main()
+        counter += 1
+        if counter == 40:
+            break
