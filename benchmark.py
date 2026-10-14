@@ -28,7 +28,7 @@ SYSTEM_INFO = RESULTS_DIR / "system_info.txt"
 TEST_MODE = True
 
 # Each final configuration is repeated 5 times.
-FINAL_REPEATS = 5
+FINAL_REPEATS = 40
 
 
 # Experiment 1:
@@ -505,9 +505,6 @@ def main():
 
 
 if __name__ == "__main__":
-    counter = 0
-    while True:
-        main()
-        counter += 1
-        if counter == 40:
-            break
+    main()
+    """counter = 0
+
