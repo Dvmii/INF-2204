@@ -1,0 +1,3 @@
+experiment,threads,memory_per_thread_mib,nominal_sort_memory_mib,n,wall_time_mean_s,wall_time_median_s,wall_time_sd_s,wall_time_cv_percent,wall_time_min_s,wall_time_max_s,throughput_mean_mib_s,max_rss_mean_mib,temp_files_median,temp_files_min,temp_files_max,disk_merge_input_fraction_median,baseline_threads,baseline_memory_per_thread_mib,runtime_ratio_vs_baseline,speedup_vs_baseline
+test,4,128,512,1,11.960732,11.960732,,,11.960732,11.960732,51.264926,634.086,16.0,16.0,16.0,0.8,,,,
+test,4,768,3072,1,11.935447,11.935447,,,11.935447,11.935447,51.37353,3125.676,0.0,0.0,0.0,0.0,,,,

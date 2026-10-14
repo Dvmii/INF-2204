@@ -1,0 +1,199 @@
+Recorded UTC: 2026-10-14T11:57:58+00:00
+Cache policy: warm
+Requested niceness: None
+Actual niceness: 0
+
+$ uname -a
+========================================================================
+Linux dictespc 6.18.54.1-microsoft-standard-WSL2 #1 SMP PREEMPT_DYNAMIC Tue Oct  6 19:13:07 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+[exit code 0]
+
+$ lscpu
+========================================================================
+Architecture:                            x86_64
+CPU op-mode(s):                          32-bit, 64-bit
+Address sizes:                           39 bits physical, 48 bits virtual
+Byte Order:                              Little Endian
+CPU(s):                                  16
+On-line CPU(s) list:                     0-15
+Vendor ID:                               GenuineIntel
+Model name:                              12th Gen Intel(R) Core(TM) i5-12500H
+CPU family:                              6
+Model:                                   154
+Thread(s) per core:                      2
+Core(s) per socket:                      8
+Socket(s):                               1
+Stepping:                                3
+BogoMIPS:                                6220.82
+Flags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology tsc_reliable nonstop_tsc cpuid tsc_known_freq pni pclmulqdq vmx ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch ssbd ibrs ibpb stibp ibrs_enhanced tpr_shadow ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves avx_vnni vnmi umip waitpkg gfni vaes vpclmulqdq rdpid movdiri movdir64b fsrm md_clear serialize ibt flush_l1d arch_capabilities
+Virtualization:                          VT-x
+Hypervisor vendor:                       Microsoft
+Virtualization type:                     full
+L1d cache:                               384 KiB (8 instances)
+L1i cache:                               256 KiB (8 instances)
+L2 cache:                                10 MiB (8 instances)
+L3 cache:                                18 MiB (1 instance)
+NUMA node(s):                            1
+NUMA node0 CPU(s):                       0-15
+Vulnerability Gather data sampling:      Not affected
+Vulnerability Ghostwrite:                Not affected
+Vulnerability Indirect target selection: Mitigation; Aligned branch/return thunks
+Vulnerability Itlb multihit:             Not affected
+Vulnerability L1tf:                      Not affected
+Vulnerability Mds:                       Not affected
+Vulnerability Meltdown:                  Not affected
+Vulnerability Mmio stale data:           Not affected
+Vulnerability Old microcode:             Not affected
+Vulnerability Reg file data sampling:    Vulnerable: No microcode
+Vulnerability Retbleed:                  Mitigation; Enhanced IBRS
+Vulnerability Spec rstack overflow:      Not affected
+Vulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl
+Vulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization
+Vulnerability Spectre v2:                Mitigation; Enhanced / Automatic IBRS; IBPB conditional; PBRSB-eIBRS SW sequence; BHI SW loop, KVM SW loop
+Vulnerability Srbds:                     Not affected
+Vulnerability Tsa:                       Not affected
+Vulnerability Tsx async abort:           Not affected
+Vulnerability Vmscape:                   Not affected
+[exit code 0]
+
+$ free -h
+========================================================================
+               total        used        free      shared  buff/cache   available
+Mem:           7.6Gi       1.1Gi       6.2Gi       4.0Mi       352Mi       6.4Gi
+Swap:          2.0Gi          0B       2.0Gi
+[exit code 0]
+
+$ df -hT .
+========================================================================
+Filesystem     Type  Size  Used Avail Use% Mounted on
+/dev/sdd       ext4 1007G   43G  914G   5% /
+[exit code 0]
+
+$ lsblk -o NAME,TYPE,SIZE,FSTYPE,MOUNTPOINTS,MODEL
+========================================================================
+NAME TYPE   SIZE FSTYPE MOUNTPOINTS                                              MODEL
+sda  disk 722.9M ext4                                                            Virtual Disk
+sdb  disk    97M ext4   /usr/lib/linux-tools/6.18.54.1-microsoft-standard-WSL2   Virtual Disk
+                        /usr/src/linux-headers-6.18.54.1-microsoft-standard-WSL2 
+sdc  disk     2G swap   [SWAP]                                                   Virtual Disk
+sdd  disk     1T ext4   /snap                                                    Virtual Disk
+                        /mnt/wslg/distro                                         
+                        /                                                        
+[exit code 0]
+
+$ samtools --version
+========================================================================
+samtools 1.13
+Using htslib 1.13+ds
+Copyright (C) 2021 Genome Research Ltd.
+
+Samtools compilation details:
+    Features:       build=configure curses=yes 
+    CC:             gcc
+    CPPFLAGS:       -frelease  -Wdate-time -D_FORTIFY_SOURCE=2
+    CFLAGS:         -g -O2 -ffile-prefix-map=�BUILDPATH�=. -flto=auto -ffat-lto-objects -fstack-protector-strong -Wformat -Werror=format-security
+    LDFLAGS:        -Wl,-Bsymbolic-functions -flto=auto -Wl,-z,relro -Wl,-z,now
+    HTSDIR:         
+    LIBS:           
+    CURSES_LIB:     -lcurses
+
+HTSlib compilation details:
+    Features:       build=configure plugins=yes, plugin-path=/usr/local/lib/htslib:/usr/local/libexec/htslib:: libcurl=yes S3=yes GCS=yes libdeflate=yes lzma=yes bzip2=yes htscodecs=1.1.1
+    CC:             gcc
+    CPPFLAGS:       -I. -DSAMTOOLS=1 -Wdate-time -D_FORTIFY_SOURCE=2
+    CFLAGS:         -g -O2 -ffile-prefix-map=/build/htslib-TQtOKr/htslib-1.13+ds=. -flto=auto -ffat-lto-objects -fstack-protector-strong -Wformat -Werror=format-security -flto -fvisibility=hidden -flto -fvisibility=hidden
+    LDFLAGS:        -Wl,-Bsymbolic-functions -flto=auto -Wl,-z,relro -Wl,-z,now -Wl,-flto -fvisibility=hidden -Wl,-flto -fvisibility=hidden
+
+HTSlib URL scheme handlers present:
+    built-in:	 preload, data, file
+    crypt4gh-needed:	 crypt4gh
+    mem:	 mem
+[exit code 0]
+
+$ /usr/bin/time --version
+========================================================================
+time (GNU Time) UNKNOWN
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by David Keppel, David MacKenzie, and Assaf Gordon.
+[exit code 0]
+
+$ /usr/bin/python3 --version
+========================================================================
+Python 3.10.12
+[exit code 0]
+
+$ git rev-parse HEAD
+========================================================================
+bd75964930954fb176053f8d6536d237823893ff
+[exit code 0]
+
+$ git status --short
+========================================================================
+ M benchmark2.py
+?? results/test/
+[exit code 0]
+
+$ ps -eo pid,ni,pcpu,pmem,comm --sort=-pcpu
+========================================================================
+    PID  NI %CPU %MEM COMMAND
+    973   0  3.4  5.7 MainThread
+    911   0  1.0  2.0 MainThread
+    136   0  0.4  0.1 snapfuse
+    474   0  0.4  1.2 python3.10
+    960   0  0.4  1.7 MainThread
+    934   0  0.2  0.7 MainThread
+   1031   0  0.2  0.6 copilot-runtime
+      1   0  0.1  0.1 systemd
+    114   0  0.1  0.1 snapfuse
+    146   0  0.1  0.1 snapfuse
+    273   0  0.1  0.5 snapd
+      2   0  0.0  0.0 init-systemd(Ub
+      3   0  0.0  0.0 init-watcher
+      7   0  0.0  0.0 init
+     61  -1  0.0  0.1 systemd-journal
+     82   0  0.0  0.0 systemd-udevd
+     94   0  0.0  0.0 snapfuse
+     95   0  0.0  0.0 snapfuse
+    100   0  0.0  0.0 snapfuse
+    107   0  0.0  0.0 snapfuse
+    120   0  0.0  0.0 snapfuse
+    126   0  0.0  0.0 snapfuse
+    135   0  0.0  0.0 snapfuse
+    144   0  0.0  0.0 snapfuse
+    175   0  0.0  0.1 systemd-resolve
+    176   0  0.0  0.0 systemd-timesyn
+    262   0  0.0  0.0 cron
+    264   0  0.0  0.0 dbus-daemon
+    269   0  0.0  0.2 networkd-dispat
+    270   0  0.0  0.0 rsyslogd
+    271   0  0.0  0.0 subiquity-serve
+    274   0  0.0  0.0 systemd-logind
+    277   0  0.0  0.1 wsl-pro-service
+    309   0  0.0  0.0 agetty
+    329   0  0.0  0.2 unattended-upgr
+    482   0  0.0  0.0 login
+    533   0  0.0  0.1 systemd
+    534   0  0.0  0.0 (sd-pam)
+    549   0  0.0  0.0 bash
+    735   0  0.0  0.0 SessionLeader
+    736   0  0.0  0.0 Relay(737)
+    737   0  0.0  0.0 bash
+    898   0  0.0  0.0 SessionLeader
+    899   0  0.0  0.0 Relay(900)
+    900   0  0.0  0.0 sh
+    901   0  0.0  0.0 sh
+    907   0  0.0  0.0 sh
+    923   0  0.0  0.0 SessionLeader
+    924   0  0.0  0.0 Relay(925)
+    925   0  0.0  0.8 MainThread
+    932   0  0.0  0.0 SessionLeader
+    933   0  0.0  0.0 Relay(934)
+    966   0  0.0  0.7 MainThread
+   2643   0  0.0  0.2 python3
+   2661   0  0.0  0.0 ps
+[exit code 0]
+

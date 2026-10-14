@@ -1,0 +1,30 @@
+Dataset characteristics
+========================================================================
+path: /home/dicte/programmering/inf2204/data/patient1.bam
+size_bytes: 642951215
+size_mib: 613.1660604476929
+alignment_records: 12386220
+header_sort_order: unsorted
+reference_sequences: 25
+reference_bases: 3080106534
+read_groups: 0
+sha256: ece402f458c233471d3d0524d80eb0fa0bb3ba0b2ed5461874de3ee636f5cbed
+
+$ samtools flagstat
+========================================================================
+12386220 + 0 in total (QC-passed reads + QC-failed reads)
+12386220 + 0 primary
+0 + 0 secondary
+0 + 0 supplementary
+887415 + 0 duplicates
+887415 + 0 primary duplicates
+12386220 + 0 mapped (100.00% : N/A)
+12386220 + 0 primary mapped (100.00% : N/A)
+0 + 0 paired in sequencing
+0 + 0 read1
+0 + 0 read2
+0 + 0 properly paired (N/A : N/A)
+0 + 0 with itself and mate mapped
+0 + 0 singletons (N/A : N/A)
+0 + 0 with mate mapped to a different chr
+0 + 0 with mate mapped to a different chr (mapQ>=5)

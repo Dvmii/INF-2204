@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Reproducible SAMtools sort benchmark for INF-2204.
 
 The script automates the full experimental campaign:
@@ -124,6 +125,8 @@ def run_capture(command: list[str], *, check: bool = False) -> subprocess.Comple
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         check=check,
     )
 
@@ -582,8 +585,10 @@ def parse_samtools_stderr(path: Path) -> dict[str, int | bool | None]:
 
 
 def build_runs(mode: str, repeats: int, seed: int) -> list[dict[str, Any]]:
+    runs: list[dict[str, Any]] = []
+
     if mode == "test":
-        return [
+        runs = [
             {
                 "experiment": "test",
                 "repeat": 1,
@@ -598,51 +603,50 @@ def build_runs(mode: str, repeats: int, seed: int) -> list[dict[str, Any]]:
             },
         ]
 
-    if mode != "final":
+    elif mode == "final":
+        # Randomized complete blocks: every repetition contains every final
+        # configuration exactly once, then the order within that repetition is
+        # shuffled deterministically.  This spreads time/temperature drift across
+        # configurations rather than always favouring an early or late setting.
+        for repeat in range(1, repeats + 1):
+            block: list[dict[str, Any]] = []
+
+            for memory_mib in MEMORY_VALUES_MIB:
+                block.append(
+                    {
+                        "experiment": "memory_scaling",
+                        "repeat": repeat,
+                        "threads": MEMORY_THREADS,
+                        "memory_mib": memory_mib,
+                    }
+                )
+
+            for threads, memory_mib in THREAD_CONFIGS:
+                block.append(
+                    {
+                        "experiment": "thread_scaling",
+                        "repeat": repeat,
+                        "threads": threads,
+                        "memory_mib": memory_mib,
+                    }
+                )
+
+            for memory_mib in CLIFF_MEMORY_VALUES_MIB:
+                block.append(
+                    {
+                        "experiment": "performance_cliff",
+                        "repeat": repeat,
+                        "threads": CLIFF_THREADS,
+                        "memory_mib": memory_mib,
+                    }
+                )
+
+            rng = random.Random(seed + repeat)
+            rng.shuffle(block)
+            runs.extend(block)
+
+    else:
         raise ValueError(f"Unsupported mode: {mode}")
-
-    runs: list[dict[str, Any]] = []
-
-    # Randomized complete blocks: every repetition contains every final
-    # configuration exactly once, then the order within that repetition is
-    # shuffled deterministically.  This spreads time/temperature drift across
-    # configurations rather than always favouring an early or late setting.
-    for repeat in range(1, repeats + 1):
-        block: list[dict[str, Any]] = []
-
-        for memory_mib in MEMORY_VALUES_MIB:
-            block.append(
-                {
-                    "experiment": "memory_scaling",
-                    "repeat": repeat,
-                    "threads": MEMORY_THREADS,
-                    "memory_mib": memory_mib,
-                }
-            )
-
-        for threads, memory_mib in THREAD_CONFIGS:
-            block.append(
-                {
-                    "experiment": "thread_scaling",
-                    "repeat": repeat,
-                    "threads": threads,
-                    "memory_mib": memory_mib,
-                }
-            )
-
-        for memory_mib in CLIFF_MEMORY_VALUES_MIB:
-            block.append(
-                {
-                    "experiment": "performance_cliff",
-                    "repeat": repeat,
-                    "threads": CLIFF_THREADS,
-                    "memory_mib": memory_mib,
-                }
-            )
-
-        rng = random.Random(seed + repeat)
-        rng.shuffle(block)
-        runs.extend(block)
 
     for run_number, run in enumerate(runs, start=1):
         run["run_number"] = run_number
