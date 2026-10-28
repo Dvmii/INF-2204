@@ -1,0 +1,6 @@
+run_id,started_at,experiment,repeat,threads,memory_per_thread_mib,nominal_sort_memory_mib,runtime_seconds,throughput_mib_s,peak_memory_mib,user_time_seconds,system_time_seconds,filesystem_inputs,filesystem_outputs,temp_files,in_memory_blocks,disk_merge_input_fraction,success
+validation_rep01_t4_m864,2026-10-28T14:27:57+0100,validation,1,4,864,3456,13.4432,52.6522,4226.25,43.12,5.74,0,0,0,4,0.0,True
+validation_rep01_t4_m832,2026-10-28T14:28:12+0100,validation,1,4,832,3328,59.373,11.9215,4128.62,53.52,7.63,0,0,1,4,0.2,True
+validation_rep01_t4_m848,2026-10-28T14:29:13+0100,validation,1,4,848,3392,29.4809,24.0093,4207.61,54.94,7.9,0,0,1,4,0.2,True
+validation_rep01_t4_m816,2026-10-28T14:29:45+0100,validation,1,4,816,3264,27.5164,25.7234,4049.46,54.48,7.93,0,0,1,4,0.2,True
+validation_rep01_t4_m880,2026-10-28T14:30:15+0100,validation,1,4,880,3520,30.5876,23.1406,4226.14,42.43,5.47,0,0,0,4,0.0,True

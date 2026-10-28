@@ -1,0 +1,103 @@
+$ uname -a
+============================================================
+Linux LAPTOP-5RM377VL 6.18.54.1-microsoft-standard-WSL2 #1 SMP PREEMPT_DYNAMIC Tue Oct  6 19:13:07 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+
+
+$ lscpu
+============================================================
+Architecture:                            x86_64
+CPU op-mode(s):                          32-bit, 64-bit
+Address sizes:                           48 bits physical, 48 bits virtual
+Byte Order:                              Little Endian
+CPU(s):                                  16
+On-line CPU(s) list:                     0-15
+Vendor ID:                               AuthenticAMD
+Model name:                              AMD Ryzen 9 5900HX with Radeon Graphics
+CPU family:                              25
+Model:                                   80
+Thread(s) per core:                      2
+Core(s) per socket:                      8
+Socket(s):                               1
+Stepping:                                0
+BogoMIPS:                                6587.69
+Flags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology tsc_reliable nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves clzero xsaveerptr arat umip vaes vpclmulqdq rdpid fsrm
+Hypervisor vendor:                       Microsoft
+Virtualization type:                     full
+L1d cache:                               256 KiB (8 instances)
+L1i cache:                               256 KiB (8 instances)
+L2 cache:                                4 MiB (8 instances)
+L3 cache:                                16 MiB (1 instance)
+NUMA node(s):                            1
+NUMA node0 CPU(s):                       0-15
+Vulnerability Gather data sampling:      Not affected
+Vulnerability Ghostwrite:                Not affected
+Vulnerability Indirect target selection: Not affected
+Vulnerability Itlb multihit:             Not affected
+Vulnerability L1tf:                      Not affected
+Vulnerability Mds:                       Not affected
+Vulnerability Meltdown:                  Not affected
+Vulnerability Mmio stale data:           Not affected
+Vulnerability Old microcode:             Not affected
+Vulnerability Reg file data sampling:    Not affected
+Vulnerability Retbleed:                  Not affected
+Vulnerability Spec rstack overflow:      Vulnerable: Safe RET, no microcode
+Vulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl
+Vulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization
+Vulnerability Spectre v2:                Mitigation; Retpolines; IBPB conditional; IBRS_FW; STIBP always-on; RSB filling; PBRSB-eIBRS Not affected; BHI Not affected
+Vulnerability Srbds:                     Not affected
+Vulnerability Tsa:                       Vulnerable: No microcode
+Vulnerability Tsx async abort:           Not affected
+Vulnerability Vmscape:                   Not affected
+
+
+$ free -h
+============================================================
+               total        used        free      shared  buff/cache   available
+Mem:           7.5Gi       2.0Gi       4.9Gi       4.4Mi       695Mi       5.4Gi
+Swap:          2.0Gi          0B       2.0Gi
+
+
+$ df -hT .
+============================================================
+Filesystem     Type  Size  Used Avail Use% Mounted on
+/dev/sdd       ext4 1007G   52G  904G   6% /
+
+
+$ samtools --version
+============================================================
+samtools 1.19.2
+Using htslib 1.19
+Copyright (C) 2024 Genome Research Ltd.
+
+Samtools compilation details:
+    Features:       build=configure curses=yes 
+    CC:             gcc
+    CPPFLAGS:       -frelease  -Wdate-time -D_FORTIFY_SOURCE=3
+    CFLAGS:         -g -O2 -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=�BUILDPATH�=. -flto=auto -ffat-lto-objects -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=�BUILDPATH�=/usr/src/samtools-1.19.2-1build2
+    LDFLAGS:        -Wl,-Bsymbolic-functions -flto=auto -ffat-lto-objects -Wl,-z,relro -Wl,-z,now
+    HTSDIR:         
+    LIBS:           
+    CURSES_LIB:     -lcurses
+
+HTSlib compilation details:
+    Features:       build=configure libcurl=yes S3=yes GCS=yes libdeflate=yes lzma=yes bzip2=yes plugins=yes plugin-path=/usr/local/lib/htslib:/usr/local/libexec/htslib:/usr/lib/x86_64-linux-gnu/htslib: htscodecs=1.6.0
+    CC:             gcc
+    CPPFLAGS:       -I. -DSAMTOOLS=1 -Wdate-time -D_FORTIFY_SOURCE=3
+    CFLAGS:         -g -O2 -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer  -flto=auto -ffat-lto-objects -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=/build/htslib-TVzaVS/htslib-1.19+ds=/usr/src/htslib-1.19+ds-1.1build3 -ffat-lto-objects -ffat-lto-objects
+    LDFLAGS:        -Wl,-Bsymbolic-functions -flto=auto -ffat-lto-objects -Wl,-z,relro -Wl,-z,now -Wl,-flto -fvisibility=hidden -ffat-lto-objects -fvisibility=hidden -rdynamic
+
+HTSlib URL scheme handlers present:
+    built-in:	 preload, data, file
+    S3 Multipart Upload:	 s3w, s3w+https, s3w+http
+    Amazon S3:	 s3+https, s3+http, s3
+    libcurl:	 imaps, pop3, gophers, http, smb, gopher, sftp, ftps, imap, rtmpte, smtp, smtps, rtsp, rtmpe, scp, ftp, telnet, mqtt, rtmp, ldap, https, ldaps, rtmps, rtmpt, pop3s, rtmpts, tftp, smbs, dict
+    Google Cloud Storage:	 gs+http, gs+https, gs
+    crypt4gh-needed:	 crypt4gh
+    mem:	 mem
+
+
+$ python3 --version
+============================================================
+Python 3.12.3
+
+

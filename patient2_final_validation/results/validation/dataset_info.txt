@@ -1,0 +1,23 @@
+path: /home/dami/programming/UiT/INF2204/INF-2204/data/patient2.bam
+size_mib: 707.81
+alignment_records: 17748550
+header_sort_order: queryname
+
+$ samtools flagstat
+============================================================
+17748550 + 0 in total (QC-passed reads + QC-failed reads)
+17748550 + 0 primary
+0 + 0 secondary
+0 + 0 supplementary
+11547113 + 0 duplicates
+11547113 + 0 primary duplicates
+17748550 + 0 mapped (100.00% : N/A)
+17748550 + 0 primary mapped (100.00% : N/A)
+0 + 0 paired in sequencing
+0 + 0 read1
+0 + 0 read2
+0 + 0 properly paired (N/A : N/A)
+0 + 0 with itself and mate mapped
+0 + 0 singletons (N/A : N/A)
+0 + 0 with mate mapped to a different chr
+0 + 0 with mate mapped to a different chr (mapQ>=5)
