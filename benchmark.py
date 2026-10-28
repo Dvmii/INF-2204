@@ -13,7 +13,10 @@ from pathlib import Path
 # SETTINGS
 # ============================================================
 
-INPUT_BAM = Path("data/patient1.bam")
+PRIMARY_BAM = Path("data/patient1.bam")
+VALIDATION_BAM = Path("data/patient2.bam")
+
+INPUT_BAM = PRIMARY_BAM
 
 RESULTS_ROOT = Path("results")
 TMP_ROOT = Path("tmp")
@@ -54,12 +57,21 @@ THREAD_EXPERIMENT = [
 # that the transition is somewhere else.
 CLIFF_EXPERIMENT = [
     {"threads": 4, "memory_mib": memory}
-    for memory in range(512, 769, 32)
+    for memory in range(600, 649, 8)
+]
+
+VALIDATION_EXPERIMENT = [
+    {"threads": 4, "memory_mib": 608},
+    {"threads": 4, "memory_mib": 632},
+    {"threads": 4, "memory_mib": 640},
+    {"threads": 4, "memory_mib": 648},
+    {"threads": 4, "memory_mib": 768},
 ]
 
 
 RESULT_COLUMNS = [
     "run_id",
+    "started_at",
     "experiment",
     "repeat",
     "threads",
@@ -265,6 +277,27 @@ def build_runs(mode, repeats):
             },
         ]
 
+    if mode == "validation":
+        runs = []
+
+        for repeat in range(1, repeats + 1):
+            block = []
+
+            for config in VALIDATION_EXPERIMENT:
+                block.append(
+                    {
+                        "experiment": "validation",
+                        "repeat": repeat,
+                        "threads": config["threads"],
+                        "memory_mib": config["memory_mib"],
+                    }
+                )
+
+            random.Random(RANDOM_SEED + repeat).shuffle(block)
+            runs.extend(block)
+
+        return runs
+
     runs = []
 
     experiments = [
@@ -348,6 +381,7 @@ def run_benchmark(config, raw_dir):
         str(INPUT_BAM),
     ]
 
+    started_at = time.strftime("%Y-%m-%dT%H:%M:%S%z")
     start = time.perf_counter()
 
     process = subprocess.run(
@@ -399,6 +433,7 @@ def run_benchmark(config, raw_dir):
 
     result = {
         "run_id": run_id,
+        "started_at": started_at,
         "experiment": experiment,
         "repeat": repeat,
         "threads": threads,
@@ -481,7 +516,7 @@ def main():
 
     parser.add_argument(
         "mode",
-        choices=["test", "final"],
+        choices=["test", "final", "validation"],
         nargs="?",
         default="test",
     )
@@ -497,6 +532,13 @@ def main():
     group.add_argument("--overwrite", action="store_true")
 
     args = parser.parse_args()
+
+    global INPUT_BAM
+
+    if args.mode == "validation":
+        INPUT_BAM = VALIDATION_BAM
+    else:
+        INPUT_BAM = PRIMARY_BAM
 
     if args.repeats < 1:
         parser.error("--repeats must be at least 1")

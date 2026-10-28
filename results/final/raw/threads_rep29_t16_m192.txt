@@ -1,0 +1,24 @@
+[bam_sort_core] merging from 0 files and 16 in-memory blocks...
+	Command being timed: "samtools sort -@ 16 -m 192M -T tmp/threads_rep29_t16_m192/tmp -o output/threads_rep29_t16_m192.bam data/patient1.bam"
+	User time (seconds): 50.20
+	System time (seconds): 4.07
+	Percent of CPU this job got: 834%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:06.50
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 3206536
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 804431
+	Voluntary context switches: 94564
+	Involuntary context switches: 2910
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 0
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
