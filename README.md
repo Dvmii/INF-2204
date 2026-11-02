@@ -1,12 +1,12 @@
 # INF-2204 Project - SAMtools sort performance
 
-This respository contains the experimental setups and scripts for the project. The project investigates how memory per thread and thread count affect the performance of `samtools sort`.
+This respository contains the experimental setups and scripts for our INF2204 project. The project investigates how memory per thread and thread count affect the performance of `samtools sort`.
 
-patient1.bam -> choose SAMtools-configurations -> execute samtools sort -> measure whats happening -> save results in CSV -> delete output -> change settings -> again
+patient.bam -> choose SAMtools-configurations -> execute samtools sort -> measure whats happening -> save results in CSV -> delete output -> change settings -> again
 
 ## Mapping performance cliffs in SAMtools sort
 
-Our main focus is execution time, peak memory usage, filesystem activity and temporary-file activity. The goal is to identify performance cliffs and see whether they are related to changes in temporary-file usage.
+Our main focus is execution time, peak memory usage, filesystem activity, and temporary-file activity. The goal is to identify performance cliffs and see whether they are related to changes in temporary-file usage.
 
 ## Files
 
