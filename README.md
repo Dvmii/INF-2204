@@ -82,7 +82,7 @@ python3 benchmark.py final --repeats 40 --overwrite
 python3 benchmark.py final --repeats 40 --resume
 
 # Run validation on second BAM file:
-python3 benchmark.py validation --repeats 5 --overwrite
+python3 benchmark_validation.py validation --repeats 5 --overwrite
 ```
 
 The configurations are randomized within every repetition.
