@@ -1,0 +1,56 @@
+DABEST: https://github.com/ACCLAB/DABEST-python?utm_source=chatgpt.com#usage
+Installing: Follow instuctions from DABEST installation insrtuctions
+
+
+We ran this in python:
+
+'''
+import pandas as pd
+import dabest
+
+df = pd.read_csv("dabest_cliff_632_vs_640.csv") 
+
+analysis = dabest.load(
+    data=df,
+    idx=("632 MiB", "640 MiB"),
+    paired="baseline",
+    id_col="repeat",
+    ci=95,
+    resamples=20000,
+    random_seed=2204
+)
+
+print(dabest.__version__) 
+print(analysis.mean_diff)
+
+print(
+    analysis.mean_diff.statistical_tests[
+        ["difference", "bca_low", "bca_high", "pvalue_wilcoxon"]
+    ]
+)
+'''
+
+
+Results:
+
+'''
+2025.10.20
+DABEST v2025.10.20
+
+Good evening!
+The current time is Wed Nov  4 18:14:16 2026.
+
+The paired mean difference for repeated measures against baseline
+between 632 MiB and 640 MiB is -4.56 [95%CI -6.75, -2.7].
+The p-value of the two-sided permutation t-test is 0.0, calculated for legacy purposes only.
+
+20000 bootstrap samples were taken; the confidence interval is bias-corrected and accelerated.
+Any p-value reported is the probability of observing theeffect size (or greater),
+assuming the null hypothesis of zero difference is true.
+For each p-value, 5000 reshuffles of the control and test labels were performed.
+
+To get the results of all valid statistical tests, use `.mean_diff.statistical_tests`
+
+difference   bca_low  bca_high  pvalue_wilcoxon
+0    -4.56036 -6.749132 -2.704383         0.000008
+'''
