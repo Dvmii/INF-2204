@@ -51,16 +51,23 @@ Both BAM datasets orginate from the same training data availale on Zendo
 BAM-file source: https://doi.org/10.5281/zenodo.892432 
 
 dataset 1: patient1.bam
+
 size: 613.17 MiB
 alignment records: 12,386,220
 SO: unsorted
-Original file: patient1_input_good_outcome.bam (download: https://zenodo.org/records/892432/files/patient1_ChIP_ER_good_outcome.bam?download=1)
+
+Original file: patient1_input_good_outcome.bam 
+download: https://zenodo.org/records/892432/files/patient1_input_good_outcome.bam?download=1
 
 dataset 2: patient2.bam
+
 size: 707.81 MiB
 alignment records: 17,748,550 
 SO: queryname
-Original file: patient2_input_good_outcome.bam (download: https://zenodo.org/records/892432/files/patient2_input_good_outcome.bam?download=1)
+
+Original file: patient2_input_good_outcome.bam
+download: https://zenodo.org/records/892432/files/patient2_input_good_outcome.bam?download=1
+
 
 Dataset 1 were prepared beforehand before running the experiments.
 patient1.bam was used with recorded BAM header sort order "SO:unsorted", while patient2.bam was name-sorted before using:
@@ -74,7 +81,8 @@ samtools sort -n -@ 4 -m 768M \
 The input file is expected to be at:
 
 ```text
-data/patient.bam
+data/patient1.bam
+data/patient2.bam
 ```
 
 ## Experiment Design
@@ -167,6 +175,19 @@ The benchmark scripts recorded the following metrics:
 - **Throughput:** Calculated as compressed input BAM size divided by wall-clock runtime.
 
 The reported temporary merge-file count does not represent total disk I/O or all temporary files created during execution. Filesystem counters were collected, but direct disk I/O volume was not independently measured.
+
+## Environmental Monitoring
+During the primary benchmark campaign on October 27, 2026, Windows host-level performance counters were collected using PowerShell `typeperf`.
+
+The monitoring recorded CPU utilization, processor performance and frequency, disk utilization, disk throughput, and average disk queue length at approximately one-second intervals.
+
+The monitoring was started before the benchmark campaign and continued beyond the final benchmark run. The resulting timestamped measurements are stored in `monitoring/final_monitor.csv`.
+
+The benchmark measurements also contain execution timestamps, allowing host-level activity to be examined alongside individual benchmark runs.
+
+The computer was connected to external power, Windows performance mode was used, and unnecessary applications and background workloads were limited during the experiments.
+
+**Monitoring does not imply complete environmental isolation.** Background processes, CPU-frequency changes, filesystem caching, and other host-level interference could not be fully controlled. The performance counters were used to characterize the experimental environment and investigate possible sources of runtime variability.
 
 ## Statistical analysis
 The primary measurements are summarized using descriptive statistics, including the mean, median, standard deviation, and interquartile range (IQR).
