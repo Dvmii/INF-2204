@@ -54,11 +54,13 @@ dataset 1: patient1.bam
 size: 613.17 MiB
 alignment records: 12,386,220
 SO: unsorted
+Original file: patient1_input_good_outcome.bam (download: https://zenodo.org/records/892432/files/patient1_ChIP_ER_good_outcome.bam?download=1)
 
 dataset 2: patient2.bam
 size: 707.81 MiB
 alignment records: 17,748,550 
 SO: queryname
+Original file: patient2_input_good_outcome.bam (download: https://zenodo.org/records/892432/files/patient2_input_good_outcome.bam?download=1)
 
 Dataset 1 were prepared beforehand before running the experiments.
 patient1.bam was used with recorded BAM header sort order "SO:unsorted", while patient2.bam was name-sorted before using:
@@ -171,6 +173,14 @@ The primary measurements are summarized using descriptive statistics, including 
 
 The performance transition between 632 and 640 MiB was further analyzed using DABEST, version 2025.10.20. [https://github.com/ACCLAB/DABEST-python](https://github.com/ACCLAB/DABEST-python.git)
 The analysis uses 40 paired repetition blocks, 20,000 bootstrap resamples, a 95% bias-corrected and accelerated (BCa) confidence interval, and a two-sided Wilcoxon signed-rank test. The relevant input data, DABEST output, reproducible commands, and estimation plot are available in the dabest/ directory.
+
+### Figures and Excel analysis
+The figures and supporting calculations used in the report are available in the Excel workbooks included in this repository. These workbooks contain visualizations of the benchmark measurements, including runtime distributions, memory scaling, thread scaling, and performance transitions.
+
+results_fixed.xlsx contains data and figures for the main experiments.
+Book1.xlsx contains the data and figures for the second BAM file.
+
+The underlying primary measurements are available in `results/final/results.csv`. The separate DABEST analysis and its estimation plot are provided in `dabest/`.
 
 ## Reproducibility and limitations
 All primary experiments were performed on the same hardware and software environment. Configuration order was randomized, and unnecessary background activity was limited during measurements.
