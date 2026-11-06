@@ -1,0 +1,4 @@
+raw/cliff_rep02_t4_m608.txt: CPU=50.50s, elapsed=118.58s, forhold=2.3x
+raw/threads_rep30_t1_m3072.txt: CPU=30.44s, elapsed=964.58s, forhold=31.7x
+raw/threads_rep08_t2_m1536.txt: CPU=35.17s, elapsed=240.08s, forhold=6.8x
+raw/memory_rep10_t4_m128.txt: CPU=45.16s, elapsed=567.96s, forhold=12.6x
