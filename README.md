@@ -56,8 +56,8 @@ size: 613.17 MiB
 alignment records: 12,386,220
 SO: unsorted
 
-Original file: patient1_input_good_outcome.bam 
-download: https://zenodo.org/records/892432/files/patient1_input_good_outcome.bam?download=1
+Original file: patient1_ChIP_ER_good_outcome.bam 
+download:https://zenodo.org/records/892432/files/patient1_ChIP_ER_good_outcome.bam?download=1
 
 dataset 2: patient2.bam
 
