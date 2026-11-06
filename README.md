@@ -65,8 +65,8 @@ size: 707.81 MiB
 alignment records: 17,748,550 
 SO: queryname
 
-Original file: patient2_input_good_outcome.bam
-download: https://zenodo.org/records/892432/files/patient2_input_good_outcome.bam?download=1
+Original file: patient2_ChIP_ER_good_outcome.bam
+download: https://zenodo.org/records/892432/files/patient2_ChIP_ER_good_outcome.bam?download=1
 
 
 Dataset 1 were prepared beforehand before running the experiments.
