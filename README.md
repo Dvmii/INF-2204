@@ -212,4 +212,6 @@ The findings describe the tested SAMtools version, workloads, and computing envi
 
 The exploratory validation uses only five repetitions per configuration.
 
+Throughput was derived from the input BAM size divided by wall-clock execution time.
+
 The benchmark source code, raw measurement data, configuration settings, and statistical analysis artifacts are provided to support reproducibility.
