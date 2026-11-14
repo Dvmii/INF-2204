@@ -1,3 +1,7 @@
+# AI-DECLARATION
+# This code is written with the assist of ChatGPT-6. It helped us with ground structure, polishing and bug fixing of the code. 
+# It helped us also write easy to understand comments. We reviewed the AI edited and added parts and take responsebility for the code written.
+
 import argparse
 import csv
 import os
