@@ -1,5 +1,6 @@
-DABEST: https://github.com/ACCLAB/DABEST-python
+DABEST: https://github.com/ACCLAB/DABEST-python?utm_source=chatgpt.com#usage
 Installing: Follow instuctions from DABEST installation insrtuctions
+
 
 
 We ran this in python:
@@ -30,8 +31,7 @@ print(
 )
 '''
 
-
-Results:
+Which gave:
 
 '''
 2025.10.20
@@ -54,6 +54,12 @@ To get the results of all valid statistical tests, use `.mean_diff.statistical_t
 difference   bca_low  bca_high  pvalue_wilcoxon
 0    -4.56036 -6.749132 -2.704383         0.000008
 '''
+
+
+
+
+
+
 
 We ran this in python:
 
@@ -85,9 +91,7 @@ print(
 )
 '''
 
-B
-
-Results:
+Which gave:
 
 '''
 2025.10.20
@@ -114,6 +118,12 @@ difference   bca_low  bca_high  pvalue_wilcoxon
 '''  
 
 
+
+
+
+
+
+
 We ran this in python:
 '''
 import pandas as pd
@@ -121,7 +131,7 @@ import dabest
 
 df = pd.read_csv("dabest_overhead.csv")
 
-memory = 632  # Bytt til 640 for den andre analysen
+memory = 632
 df = df[df["memory_mib"] == memory]
 
 analysis = dabest.load(
@@ -145,8 +155,7 @@ print(
 )
 '''
 
-
-Results:
+Which gave:
 
 '''
 2025.10.20
@@ -169,6 +178,12 @@ To get the results of all valid statistical tests, use `.mean_diff.statistical_t
 difference   bca_low  bca_high  pvalue_wilcoxon
 0    2.599248 -1.134228  9.405967         0.275391
 '''
+
+
+
+
+
+
 
 
 We ran this in python:
@@ -202,7 +217,7 @@ print(
 )
 '''
 
-Results:
+Which gave:
 '''
 DABEST v2025.10.20
 ==================
@@ -223,4 +238,60 @@ To get the results of all valid statistical tests, use `.mean_diff.statistical_t
 
 difference   bca_low  bca_high  pvalue_wilcoxon
 0    -0.18095 -2.994041  1.624915              1.0
+'''
+
+
+
+
+
+
+We also ran this in python:
+
+'''
+import dabest
+import numpy as np
+import pandas as pd
+from dabest._stats_tools.confint_1group import compute_1group_bootstraps
+
+df = pd.read_csv("dabest_speedup_input.csv")
+threads = [1, 2, 4, 8, 16]
+x = df[["t1", "t2", "t4", "t8", "t16"]].to_numpy()
+
+assert df["repeat"].is_unique
+assert x.shape == (40, 5) and np.isfinite(x).all()
+
+speedup = lambda a: np.median(a, axis=0)[0] / np.median(a, axis=0)
+
+bootstraps = compute_1group_bootstraps(
+    x, speedup, resamples=20000, random_seed=2204
+)
+
+low, high = np.quantile(bootstraps, [0.025, 0.975], axis=0)
+estimate = speedup(x)
+
+result = pd.DataFrame({
+    "threads": threads,
+    "speedup": estimate,
+    "ci_low": low,
+    "ci_high": high,
+    "error_minus": estimate - low,
+    "error_plus": high - estimate,
+})
+
+print("DABEST:", dabest.__version__)
+print(result.round(6).to_string(index=False))
+result.to_csv("speedup_dabest_results.csv", index=False)
+'''
+
+Which gave:
+
+'''
+DABEST: 2025.10.20
+ threads  speedup   ci_low  ci_high  error_minus  error_plus
+       1 1.000000 1.000000 1.000000     0.000000    0.000000
+       2 1.838577 1.824344 1.849835     0.014233    0.011258
+       4 2.900443 2.880506 2.932792     0.019938    0.032349
+       8 4.067697 4.030052 4.108483     0.037645    0.040786
+      16 4.468660 4.378165 4.634473     0.090496    0.165813
+
 '''
