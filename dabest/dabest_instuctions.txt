@@ -169,3 +169,58 @@ To get the results of all valid statistical tests, use `.mean_diff.statistical_t
 difference   bca_low  bca_high  pvalue_wilcoxon
 0    2.599248 -1.134228  9.405967         0.275391
 '''
+
+
+We ran this in python:
+'''
+import pandas as pd
+import dabest
+
+df = pd.read_csv("dabest_overhead.csv")
+
+memory = 640
+df = df[df["memory_mib"] == memory]
+
+analysis = dabest.load(
+    data=df,
+    idx=("Without GNU time", "With GNU time"),
+    paired="baseline",
+    id_col="repeat",
+    ci=95,
+    resamples=20000,
+    random_seed=2204
+)
+
+print(dabest.__version__)
+print(f"Memory: {memory} MiB")
+print(analysis.mean_diff)
+
+print(
+    analysis.mean_diff.statistical_tests[
+        ["difference", "bca_low", "bca_high", "pvalue_wilcoxon"]
+    ]
+)
+'''
+
+Results:
+'''
+DABEST v2025.10.20
+==================
+
+Good afternoon!
+The current time is Sun Nov 15 17:28:12 2026.
+
+The paired mean difference for repeated measures against baseline
+between Without GNU time and With GNU time is -0.181 [95%CI -2.99, 1.62].
+The p-value of the two-sided permutation t-test is 0.764, calculated for legacy purposes only.
+
+20000 bootstrap samples were taken; the confidence interval is bias-corrected and accelerated.
+Any p-value reported is the probability of observing theeffect size (or greater),
+assuming the null hypothesis of zero difference is true.
+For each p-value, 5000 reshuffles of the control and test labels were performed.
+
+To get the results of all valid statistical tests, use `.mean_diff.statistical_tests`
+
+difference   bca_low  bca_high  pvalue_wilcoxon
+0    -0.18095 -2.994041  1.624915              1.0
+'''
