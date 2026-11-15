@@ -206,7 +206,7 @@ During the primary benchmark campaign on October 27, 2026, Windows host-level pe
 
 The monitoring recorded CPU utilization, processor performance and frequency, disk utilization, disk throughput, and average disk queue length at approximately one-second intervals.
 
-The monitoring was started before the benchmark campaign and continued beyond the final benchmark run. The resulting timestamped measurements are stored in `monitoring/final_monitor.csv`.
+The monitoring was started before the benchmark campaign and continued beyond the final benchmark run. The resulting timestamped measurements are stored in `monitoring/final_monitor(1).csv`.
 
 The benchmark measurements also contain execution timestamps, allowing host-level activity to be examined alongside individual benchmark runs.
 
@@ -237,7 +237,7 @@ The figures and supporting calculations used in the report are available in the 
 results_fixed.xlsx contains data and figures for the main experiments.
 Book1.xlsx contains the data and figures for the second BAM file.
 
-The underlying primary measurements are available in `results/final/results.csv`. The separate DABEST analysis and its estimation plot are provided in `dabest/`.
+The underlying primary measurements are available, see the file-overview. 
 
 ## Timing discrepancies and sensitivity analysis
 
@@ -266,7 +266,9 @@ python3 instrumentation_overhead.py
 The script creates a new timestamped directory named `results/overhead_YYYYMMDD_HHMMSS/`, containing `results.csv` and per-run diagnostic logs. Its CSV records the run identifier, thread and memory settings, pair number, within-pair position, condition, and runtime.
 
 A related host-monitoring trace is available in [monitoring/overheadmonitor20261115_135012.csv](monitoring/overheadmonitor20261115_135012.csv). 
-And the files in results/overhead....
+And the files in [results/overhead_20261115_135052](results/overhead_20261115_135052). 
+
+Also see dabest/dabest_overheas.csv and the dabest/dabest_instruction.txt for the analysis on the results.
 
 ## Output correctness check
 Three addition output files were examined using samtools stats and samtools view -c, seperatly from the timed primary campaign.
