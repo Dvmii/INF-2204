@@ -219,19 +219,23 @@ The computer was connected to external power, Windows performance mode was used,
 ## Statistical analysis
 The primary measurements are summarized using descriptive statistics, including the mean, median, standard deviation, and interquartile range (IQR).
 
-The performance transition between 632 and 640 MiB was further analyzed using DABEST, version 2025.10.20. [https://github.com/ACCLAB/DABEST-python](https://github.com/ACCLAB/DABEST-python.git)
-The analysis uses 40 paired repetition blocks, 20,000 bootstrap resamples, a 95% bias-corrected and accelerated (BCa) confidence interval, and a two-sided Wilcoxon signed-rank test. The relevant input data, DABEST output, reproducible commands, and estimation plot are available in the dabest/ directory.
+DABEST version 2025.10.20. [https://github.com/ACCLAB/DABEST-python](https://github.com/ACCLAB/DABEST-python.git)  was used for the analyses below. Input data, commands, and recorded outputs are available in the dabest/ directory.
 
 | Comparison | Input data |
 |---|---|
 | 632 versus 640 MiB per thread, with four threads | [dabest_cliff_632_vs_640.csv](dabest/dabest_cliff_632_vs_640.csv) |
 | 8 versus 16 threads, with the nominal memory budget fixed at 3072 MiB | [dabest_8_vs_16_paired.csv](dabest/dabest_8_vs_16_paired.csv) |
+| 632 MiB with verus without GNU time | [dabest_overhead.csv](dabest_overhead.csv) |
+| 640 MiB with versus without GNU time | [dabest_overhead.csv](dabest_overhead.csv) |
+| Experiment 2 speedup CI | [dabest_speedup_input.csv](dabest_speedup_input.csv) |
 
-Each of the two analyses pairs observations by repetition block and uses 40 pairs, 20,000 bootstrap resamples, a 95% bias-corrected and accelerated (BCa) confidence interval for the mean difference, and random seed 2204.
+The two main runtime comparisons used 40 pairs, matched by repetition block. Each overhead comparison used 10 pairs. These analyses estimated mean paired runtime differences using 20,000 bootstrap resamples, 95% bias-corrected and accelerated (BCa) confidence intervals, and random seed 2204.
 
-Two-sided Wilcoxon signed-rank tests provide a supplementary comparison. Their interpretation is limited by uncertainty about the symmetry of the paired difference distributions. Interpretation primarily concerns mean effect estimates and bootstrap confidence intervals. These comparisons are exploratory.
+Runtime differences were calculated as the second condition minus the first. Negative differences therefore favor the second condition. These intervals describe uncertainty in the mean paired difference, rather than the spread of individual runtimes or a difference between medians.
 
-The paired mean difference is calculated as the second condition minus the first. A negative runtime difference therefore favors the second condition. The interval describes uncertainty in the mean difference, rather than the spread of individual runtimes or a difference between medians.
+Two-sided Wilcoxon signed-rank tests provided supplementary comparisons. Their interpretation is limited by uncertainty about the symmetry of the paired difference distributions. These comparisons are exploratory.
+
+For Experiment 2, speedup was calculated as the single-thread median runtime divided by the median runtime at each thread setting. Using DABEST's bootstrap helper, the 40 repetition blocks were resampled jointly 20,000 times with seed 2204. The 2.5th and 97.5th percentiles of the resulting speedup distributions formed the 95% percentile bootstrap confidence intervals.
 
 ### Figures and Excel analysis
 The figures and supporting calculations used in the report are available in the Excel workbooks included in this repository. These workbooks contain visualizations of the benchmark measurements, including runtime distributions, memory scaling, thread scaling, and performance transitions.
