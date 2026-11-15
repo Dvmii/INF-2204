@@ -118,6 +118,8 @@ In this experiment the thread count is fixed at 4 and memory is tested in smalle
 ```
 Repetitions: 40 per configuration (total 280 runs).
 
+A pilot campaign with five repetitions per configuration (100 runs) was used to select the memory range for Experiment 3. The original results can be found in [results/pilot_patient1_20261021/](results/pilot_patient1_20261021/). Pilot runs are excluded from the 720-run main analysis.
+
 ### Validation - Second BAM dataset
 
 The second BAM dataset was evaluated through exploratory runs followed by a final validation campaign. 4 threads.
@@ -202,7 +204,7 @@ The benchmark scripts recorded the following metrics:
 The reported temporary merge-file count does not represent total disk I/O or all temporary files created during execution. Filesystem counters were collected, but direct disk I/O volume was not independently measured.
 
 ## Environmental Monitoring
-During the primary benchmark campaign on October 27, 2026, Windows host-level performance counters were collected using PowerShell `typeperf`.
+During the primary benchmark campaign, Windows host-level performance counters were collected using PowerShell `typeperf`.
 
 The monitoring recorded CPU utilization, processor performance and frequency, disk utilization, disk throughput, and average disk queue length at approximately one-second intervals.
 
