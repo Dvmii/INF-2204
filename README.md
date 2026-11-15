@@ -15,8 +15,8 @@ We performed three primary experiments, in total 720 sorting runs across 18 conf
 |---|---|
 | [final_report_inf2204_15112026.pdf](final_report_inf2204_15112026.pdf) | Final 2204 Project Report |
 | [benchmark.py](benchmark.py) | Main benchmark script. |
-| [benchmark_validation.py](benchmark_validation.py) | Script with the final Patient 2 validation configurations. |
-| [instrumentation_overhead.py](instrumentation_overhead.py) | Paired comparison with and without GNU time. |
+| [benchmark_validation.py](benchmark_validation.py) | Script for patient 2 validation configurations. |
+| [instrumentation_overhead.py](instrumentation_overhead.py) | Script for paired comparison with and without GNU time. |
 | [results/final/](results/final/) | Primary campaign: 720 measurements, raw logs, and dataset and system information. |
 | [results/test/](results/test/) | Initial benchmark test measurements. |
 | [patient2/](patient2/) | Archived pilot, exploratory, and final validation campaigns. |
