@@ -292,6 +292,11 @@ The statistics, count files, and SAMtools version information are retained in [r
 
 This does not change that the primary campaigns integrity check remains as just a samtools quickcheck.
 
+## AI declaration
+The initial version of the Benchmark script was fully AI generated. This code is in the first commits of the benchmark, but is NOT the version that we used for our runs. This benchmark was only made, using ChatGPT-6, to run as a tool while we explored how SAMtools works before deciding how we would run our own benchmark. A final benchmark was later written by Damian, this version had bugs and a chaotic structure, so AI was again used as a tool to restructure the implementation. This final revised benchmark script was used for the experiments.
+
+The checks performed on the benchmark and its outputs, including their scope and limitations, are documented in this README and in the final report. We take full responsibility for the final code. 
+
 ## Reproducibility and limitations
 The archived scripts, parameter settings, measurements, diagnostic logs, system and dataset metadata, analysis workbooks, and supplementary correctness outputs document the experimental workflow. The benchmark source code, raw measurement data, configuration settings, and statistical analysis artifacts are provided to support reproducibility.
 
